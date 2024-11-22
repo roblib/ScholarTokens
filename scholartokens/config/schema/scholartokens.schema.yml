@@ -1,0 +1,8 @@
+# Schema for the configuration files of the ScholarTokens module.
+scholartokens.settings:
+  type: config_object
+  label: 'ScholarTokens settings'
+  mapping:
+    fields:
+      type: string
+      label: 'Choose date field to be tokenized'

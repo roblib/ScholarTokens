@@ -1,0 +1,6 @@
+scholartokens.scholar_tokens_settings:
+  title: Scholar tokens settings
+  description: set default field for token
+  parent: system.admin_config_search
+  route_name: scholartokens.scholar_tokens_settings
+  weight: 10

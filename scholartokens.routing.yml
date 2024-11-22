@@ -1,0 +1,7 @@
+scholartokens.scholar_tokens_settings:
+  path: '/admin/search/scholar-tokens-settings'
+  defaults:
+    _title: 'Scholar tokens settings'
+    _form: 'Drupal\scholartokens\Form\ScholarTokensSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
