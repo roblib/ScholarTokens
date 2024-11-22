@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for ScholarTokens module.
+ */
+
+use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Render\BubbleableMetadata;
+
+/**
+ * Implements hook_token_info().
+ */
+function scholartokens_token_info() {
+  $type = [
+    'name' => t('Scholar Tokens'),
+    'description' => t('Supplemental Tokens for Islandora Scholar objects.'),
+  ];
+
+  $node['scholar_author'] = [
+    'name' => t("Author"),
+    'description' => t("The node's filtered Contributor linked agents"),
+  ];
+
+  $node['scholar_date_issued'] = [
+    'name' => t("Date Issued"),
+    'description' => t("The node's Issued Date"),
+  ];
+
+  return [
+    'types' => ['scholartokens' => $type],
+    'tokens' => ['scholartokens' => $node],
+  ];
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function scholartokens_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+  if ($type == 'scholartokens' && !empty($data['node'])) {
+    if (!is_array($tokens) || empty($tokens)) {
+      \Drupal::logger('scholartokens')
+        ->alert('Tokens not correct format: @tokens', [
+          '@tokens' => print_r($tokens, 1),
+        ]);
+      return;
+    }
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'scholar_author':
+          $allowed = ['relators:aut', 'relators:cre'];
+          $replacement = scholartokens_get_term_with_rel_type($data['node'], 'field_linked_agent', $allowed, TRUE);
+          $replacements[$original] = $replacement;
+          break;
+
+        case 'scholar_date_issued':
+          $node = $data['node'];
+          $replacement = scholartokens_format_date($node->get('field_edtf_date_issued')->value);
+          $replacements[$original] = $replacement;
+          break;
+      }
+    }
+  }
+  return $replacements;
+}
+
+/**
+ * Date formatter.
+ *
+ * @param string $original
+ *   The EDTF date from the node.
+ */
+function scholartokens_format_date($original) {
+  $date_parts = explode('-', $original);
+  if (count($date_parts) == 1) {
+    $replacement = $date_parts[0];
+  }
+  if (count($date_parts) == 2) {
+    $replacement = $date_parts[0];
+  }
+  if (count($date_parts) == 3) {
+    $replacement = implode('/', $date_parts);
+  }
+
+  return $replacement;
+
+}
+
+/**
+ * Helper function to load values for a taxonomy term with a relationship type.
+ *
+ * @param object $node
+ *   A core drupal node object.
+ * @param string $field_name
+ *   The name of the node's field to check for the specific relationship.
+ * @param array $relation_types
+ *   Optional values to check the rel_type of the taxonomy term against. When
+ *   not provided, any terms returned for the field will match.
+ * @param bool $remove_comma
+ *   Will flip the string parts of a CSV.
+ *
+ * @return string
+ *   The tokenized value for the given data.
+ */
+function scholartokens_get_term_with_rel_type($node, $field_name, array $relation_types = [], $remove_comma = FALSE) {
+  $settings = \Drupal::config('metatag.settings');
+  $separator = $settings->get('separator');
+  $separator = ($separator) ? $separator : ',';
+  $matches = [];
+  $field = ($node->hasField($field_name) ? $node->get($field_name) : NULL);
+  if (is_object($field)) {
+    $tids = $field->getValue();
+    foreach ($tids as $tid) {
+      // Inspect the taxonomy term.
+      if (
+        is_array($tid) &&
+        array_key_exists('target_id', $tid)
+      ) {
+        if ($relation_types && array_key_exists('rel_type', $tid)) {
+          if (in_array($tid['rel_type'], $relation_types)) {
+            $term = Term::load($tid['target_id']);
+            if ($term) {
+              $matches[] = ($separator == ',') ? controlled_access_terms_remove_comma($term->getName(), $remove_comma) : $term->getName();
+            }
+          }
+        }
+        else {
+          $term = Term::load($tid['target_id']);
+          if ($term) {
+            $matches[] = ($separator == ',') ? controlled_access_terms_remove_comma($term->getName(), $remove_comma) : $term->getName();
+          }
+        }
+      }
+    }
+  }
+  return implode($separator, $matches);
+}
