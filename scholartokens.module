@@ -75,6 +75,9 @@ function scholartokens_format_date($node) {
   $config = \Drupal::config('scholartokens.settings');
   $field = $config->get('field');
   $original = $node->get($field)->value;
+  if (!$original) {
+    return '';
+  }
   $date_parts = explode('-', $original);
   if (count($date_parts) == 1) {
     $replacement = $date_parts[0];
