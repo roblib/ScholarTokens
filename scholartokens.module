@@ -78,6 +78,10 @@ function scholartokens_format_date($node) {
   if (!$original) {
     return '';
   }
+  $forbidden = ['?', '%', '~'];
+  $original = str_replace($forbidden, '', $original);
+  $date_parts = explode('T', $original);
+  $original = $date_parts[0];
   $date_parts = explode('-', $original);
   if (count($date_parts) == 1) {
     $replacement = $date_parts[0];
@@ -86,11 +90,13 @@ function scholartokens_format_date($node) {
     $replacement = $date_parts[0];
   }
   if (count($date_parts) == 3) {
+    $date_parts = array_map(function ($value) {
+      // Ltrim removes leading zeros.
+      return ltrim($value, '0');
+    }, $date_parts);
     $replacement = implode('/', $date_parts);
   }
-
   return $replacement;
-
 }
 
 /**
