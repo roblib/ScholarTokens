@@ -1,7 +1,0 @@
-name: 'ScholarTokens'
-type: module
-description: 'supplies tokens for the Scholar metatags'
-package: Custom
-core_version_requirement: ^10 || ^11
-dependencies:
-  - token:token
