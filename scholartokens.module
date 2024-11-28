@@ -27,6 +27,16 @@ function scholartokens_token_info() {
     'description' => t("The node's Issued Date"),
   ];
 
+  $node['scholar_start_page'] = [
+    'name' => t("Start Page"),
+    'description' => t("The node's Issued Date"),
+  ];
+
+  $node['scholar_end_page'] = [
+    'name' => t("End Page"),
+    'description' => t("The node's Issued Date"),
+  ];
+
   return [
     'types' => ['scholartokens' => $type],
     'tokens' => ['scholartokens' => $node],
@@ -58,6 +68,18 @@ function scholartokens_tokens($type, $tokens, array $data, array $options, Bubbl
           $node = $data['node'];
           $replacement = scholartokens_format_date($node);
           $replacements[$original] = $replacement;
+          break;
+
+        case 'scholar_start_page':
+          $node = $data['node'];
+          $replacement = scholartokens_page_range($node, 'reset');
+          $replacements[$original] = trim($replacement);
+          break;
+
+        case 'scholar_end_page':
+          $node = $data['node'];
+          $replacement = scholartokens_page_range($node, 'end');
+          $replacements[$original] = trim($replacement);
           break;
       }
     }
@@ -97,6 +119,22 @@ function scholartokens_format_date($node) {
     $replacement = implode('/', $date_parts);
   }
   return $replacement;
+}
+
+/**
+ * Parses date range.
+ */
+function scholartokens_page_range($node, $function) {
+  $config = \Drupal::config('scholartokens.settings');
+  $splitters = [',', '_', '-'];
+  $field = $config->get('range_field');
+  $original = $node->get($field)->value;
+  $original = str_replace($splitters, '|', $original);
+  if (!$original) {
+    return '';
+  }
+  $range_parts = explode('|', $original);
+  return $function($range_parts);
 }
 
 /**

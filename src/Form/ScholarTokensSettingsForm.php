@@ -70,9 +70,16 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $fields = $this->entityFieldManager->getFieldDefinitions('node', 'islandora_object');
     $date_fields = [];
+    $range_fields = [];
     foreach ($fields as $field_name => $field_definition) {
       if ($field_definition->getType() === 'edtf') {
         $date_fields[$field_name] = $field_definition->getLabel();
+      }
+    }
+
+    foreach ($fields as $field_name => $field_definition) {
+      if ($field_definition->getType() === 'string') {
+        $range_fields[$field_name] = $field_definition->getLabel();
       }
     }
     $form['field'] = [
@@ -80,6 +87,13 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Choose date field to be tokenized'),
       '#options' => $date_fields,
       '#default_value' => $this->config('scholartokens.settings')->get('field'),
+    ];
+
+    $form['range_field'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Choose range field to be tokenized'),
+      '#options' => $range_fields,
+      '#default_value' => $this->config('scholartokens.settings')->get('range_field'),
     ];
     return parent::buildForm($form, $form_state);
   }
@@ -107,6 +121,7 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->config('scholartokens.settings')
       ->set('field', $form_state->getValue('field'))
+      ->set('range_field', $form_state->getValue('range_field'))
       ->save();
     parent::submitForm($form, $form_state);
   }
