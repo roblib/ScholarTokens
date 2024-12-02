@@ -129,10 +129,10 @@ function scholartokens_page_range($node, $function) {
   $splitters = [',', '_', '-'];
   $field = $config->get('range_field');
   $original = $node->get($field)->value;
-  $original = str_replace($splitters, '|', $original);
   if (!$original) {
     return '';
   }
+  $original = str_replace($splitters, '|', $original);
   $range_parts = explode('|', $original);
   return $function($range_parts);
 }
