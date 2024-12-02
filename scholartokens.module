@@ -19,22 +19,22 @@ function scholartokens_token_info() {
 
   $node['scholar_author'] = [
     'name' => t("Author"),
-    'description' => t("The node's filtered Contributor linked agents"),
+    'description' => t("The citation's filtered Contributor linked agents"),
   ];
 
   $node['scholar_date_issued'] = [
     'name' => t("Date Issued"),
-    'description' => t("The node's Issued Date"),
+    'description' => t("The citation's Issued Date"),
   ];
 
   $node['scholar_start_page'] = [
     'name' => t("Start Page"),
-    'description' => t("The node's Issued Date"),
+    'description' => t("The citation's starting page"),
   ];
 
   $node['scholar_end_page'] = [
     'name' => t("End Page"),
-    'description' => t("The node's Issued Date"),
+    'description' => t("The citation's end page"),
   ];
 
   return [
