@@ -82,6 +82,11 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
         $range_fields[$field_name] = $field_definition->getLabel();
       }
     }
+    foreach ($fields as $field_name => $field_definition) {
+      if ($field_definition->getType() === 'typed_relation') {
+        $typed_relation_fields[$field_name] = $field_definition->getLabel();
+      }
+    }
     $form['field'] = [
       '#type' => 'select',
       '#title' => $this->t('Choose date field to be tokenized'),
@@ -93,6 +98,13 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Choose range field to be tokenized'),
       '#options' => $range_fields,
+      '#default_value' => $this->config('scholartokens.settings')->get('range_field'),
+    ];
+
+    $form['contributor_field'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Choose contributor field to be tokenized'),
+      '#options' => $typed_relation_fields,
       '#default_value' => $this->config('scholartokens.settings')->get('range_field'),
     ];
     return parent::buildForm($form, $form_state);
@@ -122,6 +134,7 @@ final class ScholarTokensSettingsForm extends ConfigFormBase {
     $this->config('scholartokens.settings')
       ->set('field', $form_state->getValue('field'))
       ->set('range_field', $form_state->getValue('range_field'))
+      ->set('contributor_field', $form_state->getValue('contributor_field'))
       ->save();
     parent::submitForm($form, $form_state);
   }

@@ -47,6 +47,7 @@ function scholartokens_token_info() {
  * Implements hook_tokens().
  */
 function scholartokens_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $config = \Drupal::config('scholartokens.settings');
   $replacements = [];
   if ($type == 'scholartokens' && !empty($data['node'])) {
     if (!is_array($tokens) || empty($tokens)) {
@@ -60,7 +61,7 @@ function scholartokens_tokens($type, $tokens, array $data, array $options, Bubbl
       switch ($name) {
         case 'scholar_author':
           $allowed = ['relators:aut', 'relators:cre'];
-          $replacement = scholartokens_get_term_with_rel_type($data['node'], 'field_linked_agent', $allowed, TRUE);
+          $replacement = scholartokens_get_term_with_rel_type($data['node'], $config->get('contributor_field'), $allowed, TRUE);
           $replacements[$original] = $replacement;
           break;
 
