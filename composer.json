@@ -1,5 +1,5 @@
 {
-    "name": "roblib/ScholarTokens",
+    "name": "roblib/scholar-tokens",
     "type": "drupal-custom-module",
     "description": "Prefills DOI form from Crossref API.",
     "license": "GPL-2.0-or-later",
